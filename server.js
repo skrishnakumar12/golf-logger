@@ -32,7 +32,11 @@ const connection = mysql.createConnection({
 
 connection.connect(err => {
   if(err) {
+      console.log("Error with connection");
       return err;
+  }
+  else {
+      console.log("Connected");
   }
 })
 
@@ -47,7 +51,8 @@ app.get('/', (req, res) =>{
 //Retrieve all the user data
 app.get('/user', (req, res) => {
   const name_id = req.query.name;
-  const SELECT_ALL_USER_QUERY = `SELECT * FROM golf_table where name=${name_id}`;
+  //const SELECT_ALL_USER_QUERY = `SELECT * FROM golf_table where name=${name_id}`;
+  const SELECT_ALL_USER_QUERY = `SELECT * FROM golf_table;`;
   connection.query(SELECT_ALL_USER_QUERY, (err, results) => {
       if(err) {
           return res.send(err)
