@@ -4,9 +4,10 @@ import {Link} from 'react-router-dom';
 function NavBar() {
   return (
     <nav className="navbar navbar-dark bg-primary fixed-top">
-      <Link className="navbar-brand" to="/">
+      <h4 className="navbar-brand">
         Golf Logger App
-      </Link>
+      </h4>
+      <button onClick={this.editScore}> Add Score</button>
     </nav>
   );
 }
