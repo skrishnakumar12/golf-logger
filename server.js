@@ -25,9 +25,9 @@ app.set('port', (process.env.PORT || 5000));
 //Connect to mySQL database
 const connection = mysql.createConnection({
   host: 'localhost',  //Change this
-  user: 'zbridwell',  //Change this
+  user: 'zbridwel@sppinsweb01.itap.purdue.edu',  //Change this
   password: '',       //Change this
-  database: 'app_tutorial'  //Change this
+  database: 'mydb.ics.purdue.edu'  //Change this
 })
 
 connection.connect(err => {
