@@ -1,25 +1,26 @@
 //import dependencies
 const express = require('express');
-const bodyParser = require('body-parser');
-const cors = require('cors');
+// const bodyParser = require('body-parser');
+// const cors = require('cors');
 const mysql = require('mysql')
-const helmet = require('helmet');
-const morgan = require('morgan');
-app.set('port', (process.env.PORT || 5000));
+// const helmet = require('helmet');
+// const morgan = require('morgan');
 
 // define the Express app
 const app = express();
 
-
-// enhance your app security with Helmet
-app.use(helmet());
-
-// use bodyParser to parse application/json content-type
-app.use(bodyParser.json());
+app.set('port', (process.env.PORT || 5000));
 
 
-// log HTTP requests
-app.use(morgan('combined'));
+// // enhance your app security with Helmet
+// app.use(helmet());
+
+// // use bodyParser to parse application/json content-type
+// app.use(bodyParser.json());
+
+
+// // log HTTP requests
+// app.use(morgan('combined'));
 
 //Connect to mySQL database
 const connection = mysql.createConnection({
@@ -35,8 +36,8 @@ connection.connect(err => {
   }
 })
 
-// enable all CORS requests
-app.use(cors());
+// // enable all CORS requests
+// app.use(cors());
 
 // retrieve Basic message
 app.get('/', (req, res) =>{
