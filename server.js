@@ -11,6 +11,17 @@ const app = express();
 
 app.set('port', (process.env.PORT || 5000));
 
+// Express only serves static assets in production
+console.log("NODE_ENV: ", process.env.NODE_ENV);
+if (process.env.NODE_ENV === 'production') {
+  app.use(express.static('frontend/build'));
+
+  // Return the main index.html, so react-router render the route in the client
+  app.get('/', (req, res) => {
+    res.sendFile(path.resolve('frontend/build', 'index.html'));
+  });
+}
+
 
 // // enhance your app security with Helmet
 // app.use(helmet());
@@ -25,9 +36,10 @@ app.set('port', (process.env.PORT || 5000));
 //Connect to mySQL database
 const connection = mysql.createConnection({
   host: 'localhost',  //Change this
-  user: 'zbridwel@sppinsweb01.itap.purdue.edu',  //Change this
-  password: '',       //Change this
-  database: 'mydb.ics.purdue.edu'  //Change this
+  user: 'root',  //Change this
+  password: 'basketball',       //Change this
+  //port: '5000',
+  database: 'zbridwel'  //Change this
 })
 
 connection.connect(err => {
@@ -50,11 +62,12 @@ app.get('/', (req, res) =>{
 
 //Retrieve all the user data
 app.get('/user', (req, res) => {
-  const name_id = req.query.name;
-  //const SELECT_ALL_USER_QUERY = `SELECT * FROM golf_table where name=${name_id}`;
-  const SELECT_ALL_USER_QUERY = `SELECT * FROM golf_table;`;
+  const name_id = req.query.name_user;
+  const SELECT_ALL_USER_QUERY = `SELECT * FROM golf_table where name_user='${name_id}';`;
+  //const SELECT_ALL_USER_QUERY = `SELECT * FROM golf_table;`;
   connection.query(SELECT_ALL_USER_QUERY, (err, results) => {
       if(err) {
+          console.log("Error with query: " + SELECT_ALL_USER_QUERY);
           return res.send(err)
       } else {
           return res.json({
@@ -67,7 +80,7 @@ app.get('/user', (req, res) => {
 // Insert a new score
 app.get('/user/add', (req, res) => {
   const{ name, course, date, score } = req.query
-  const INSERT_SCORE_QUERY = `INSERT INTO golf_table(name, course, date, score) VALUES('${name}', '${course}', '${date}', '${score}')`
+  const INSERT_SCORE_QUERY = `INSERT INTO golf_table(name, course, date, score) VALUES('${name}', '${course}', '${date}', '${score}');`
   connection.query(INSERT_SCORE_QUERY, (err, results) => {
       if(err) {
           return res.send(err)
