@@ -6,23 +6,13 @@ import './App.css';
 
 class App extends Component {
   state = {
-    scores: [{
-      name: 'Shankar Krishnakumar',
-      course: 'Augusta',
-      date: '2018-11-01',
-      score: '74'
-    },
-    {
-      name: 'Zach Bridwell',
-      course: 'Augusta',
-      date: '2018-10-04',
-      score: '68'
-    }],
+    login: 'skrishnakumar',
+    scores: [],
     userScore: {
-      name: 'Shankar Krishnakumar',
-      course: 'Augusta',
-      date: '2018-11-01',
-      score: '74'
+      username: '',
+      course_name: '',
+      date_score: '',
+      score: ''
     }
   }
 
@@ -31,7 +21,7 @@ class App extends Component {
   }
 
   getScores = () => {
-    fetch('http://localhost:5000/user')
+    fetch(`/user?username='${login}'`)
     .then(response => response.json())
     .then(response => this.setState({ scores: response.data}))
     .catch(err => console.log(err))
@@ -41,7 +31,7 @@ class App extends Component {
 
   addScore = () => {
     const { userScore } = this.state
-    fetch(`http://localhost:5000/user/add?name=${userScore.name}&course=${userScore.course}&date=${userScore.date}&score=${userScore.score}`)
+    fetch(`/user/add?username='${userScore.username}'&course_name='${userScore.course_name}'&date_score='${userScore.date_score}'&score='${userScore.score}'`)
     .then(this.getScores)
     .catch( err => console.log(err))
   }
