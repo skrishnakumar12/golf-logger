@@ -2,7 +2,7 @@
 const express = require('express');
 // const bodyParser = require('body-parser');
 // const cors = require('cors');
-const mysql = require('mysql')
+var mysql = require('mysql')
 // const helmet = require('helmet');
 // const morgan = require('morgan');
 
@@ -23,14 +23,19 @@ app.set('port', (process.env.PORT || 5000));
 // app.use(morgan('combined'));
 
 //Connect to mySQL database
-const connection = mysql.createConnection({
-  host: 'localhost',  //Change this
-  user: 'zbridwel@sppinsweb01.itap.purdue.edu',  //Change this
-  password: '',       //Change this
-  database: 'mydb.ics.purdue.edu'  //Change this
-})
+var connection = mysql.createConnection({
+  host: 'mydb.ics.purdue.edu', 
+  user: 'zbridwel', 
+  password: 'cs252proj',       
+  database: 'zbridwel'  
+});
+connection.connect(function(err){
+    if(err) throw err;
+    else console.log("connected");
+});
 
-connection.connect(err => {
+
+/*connection.connect(err => {
   if(err) {
       console.log("Error with connection");
       return err;
@@ -38,7 +43,7 @@ connection.connect(err => {
   else {
       console.log("Connected");
   }
-})
+})*/
 
 // // enable all CORS requests
 // app.use(cors());
