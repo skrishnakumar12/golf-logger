@@ -34,45 +34,25 @@ if (process.env.NODE_ENV === 'production') {
 // app.use(morgan('combined'));
 
 //Connect to mySQL database
-<<<<<<< HEAD
-var connection = mysql.createConnection({
-  host: 'mydb.ics.purdue.edu', 
-  user: 'zbridwel', 
-  password: 'cs252proj',       
-  database: 'zbridwel'  
-});
-connection.connect(function(err){
-    if(err) throw err;
-    else console.log("connected");
-});
-
-
-/*connection.connect(err => {
-=======
 const connection = mysql.createConnection({
-  host: "localhost",  //Change this
-  user: "root",  //Change this
-  password: "password",       //Change this
-  database: "zbridwel",  //Change this
-//   host: "mydb.ics.purdue.edu",  //Change this
-//   user: "zbridwel@sppinsweb01.itap.purdue.edu",  //Change this
-//   password: "cs252proj",       //Change this
-//   database: "zbridwel",  //Change this
+  //host: "localhost",  //Change this
+  //user: "root",  //Change this
+  //password: "password",       //Change this
+  //database: "zbridwel",  //Change this
+   host: "golf-logger.database.windows.net",  //Change this
+   user: "zbridwel",  //Change this
+   password: "Cs252proj",       //Change this
+   database: "golf-logger",  //Change this
   insecureAuth: true
 })
 
 connection.connect(function(err) {
->>>>>>> 4eac9b237041b6d66f7191e2e42d2920447144c5
   if(err) {
       console.error("Error connecting: " + err.stack);
       return;
   }
-<<<<<<< HEAD
-})*/
-=======
     console.log("Connected as id: " + connection.threadId);
 })
->>>>>>> 4eac9b237041b6d66f7191e2e42d2920447144c5
 
 // // enable all CORS requests
 // app.use(cors());
