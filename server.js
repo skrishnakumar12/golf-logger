@@ -11,6 +11,17 @@ const app = express();
 
 app.set('port', (process.env.PORT || 5000));
 
+// Express only serves static assets in production
+console.log("NODE_ENV: ", process.env.NODE_ENV);
+if (process.env.NODE_ENV === 'production') {
+  app.use(express.static('frontend/build'));
+
+  // Return the main index.html, so react-router render the route in the client
+  app.get('/', (req, res) => {
+    res.sendFile(path.resolve('frontend/build', 'index.html'));
+  });
+}
+
 
 // // enhance your app security with Helmet
 // app.use(helmet());
@@ -23,6 +34,7 @@ app.set('port', (process.env.PORT || 5000));
 // app.use(morgan('combined'));
 
 //Connect to mySQL database
+<<<<<<< HEAD
 var connection = mysql.createConnection({
   host: 'mydb.ics.purdue.edu', 
   user: 'zbridwel', 
@@ -36,14 +48,31 @@ connection.connect(function(err){
 
 
 /*connection.connect(err => {
+=======
+const connection = mysql.createConnection({
+  host: "localhost",  //Change this
+  user: "root",  //Change this
+  password: "password",       //Change this
+  database: "zbridwel",  //Change this
+//   host: "mydb.ics.purdue.edu",  //Change this
+//   user: "zbridwel@sppinsweb01.itap.purdue.edu",  //Change this
+//   password: "cs252proj",       //Change this
+//   database: "zbridwel",  //Change this
+  insecureAuth: true
+})
+
+connection.connect(function(err) {
+>>>>>>> 4eac9b237041b6d66f7191e2e42d2920447144c5
   if(err) {
-      console.log("Error with connection");
-      return err;
+      console.error("Error connecting: " + err.stack);
+      return;
   }
-  else {
-      console.log("Connected");
-  }
+<<<<<<< HEAD
 })*/
+=======
+    console.log("Connected as id: " + connection.threadId);
+})
+>>>>>>> 4eac9b237041b6d66f7191e2e42d2920447144c5
 
 // // enable all CORS requests
 // app.use(cors());
@@ -55,11 +84,12 @@ app.get('/', (req, res) =>{
 
 //Retrieve all the user data
 app.get('/user', (req, res) => {
-  const name_id = req.query.name;
-  //const SELECT_ALL_USER_QUERY = `SELECT * FROM golf_table where name=${name_id}`;
-  const SELECT_ALL_USER_QUERY = `SELECT * FROM golf_table;`;
-  connection.query(SELECT_ALL_USER_QUERY, (err, results) => {
+  const name_id = req.query.username;
+  const SELECT_SPECIFIC_USER_QUERY = `SELECT * FROM golf_table where username='${name_id}';`;
+  //const SELECT_ALL_USER_QUERY = `SELECT * FROM golf_table;`;
+  connection.query(SELECT_SPECIFIC_USER_QUERY, (err, results) => {
       if(err) {
+          console.log("Error with query: " + SELECT_ALL_USER_QUERY);
           return res.send(err)
       } else {
           return res.json({
@@ -71,8 +101,8 @@ app.get('/user', (req, res) => {
 
 // Insert a new score
 app.get('/user/add', (req, res) => {
-  const{ name, course, date, score } = req.query
-  const INSERT_SCORE_QUERY = `INSERT INTO golf_table(name, course, date, score) VALUES('${name}', '${course}', '${date}', '${score}')`
+  const{ username, course_name, date_score, score } = req.query
+  const INSERT_SCORE_QUERY = `INSERT INTO golf_table(username, course_name, date_score, score) VALUES('${username}', '${course_name}', '${date_score}', '${score}');`
   connection.query(INSERT_SCORE_QUERY, (err, results) => {
       if(err) {
           return res.send(err)
