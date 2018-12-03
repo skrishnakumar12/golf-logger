@@ -12,6 +12,7 @@
     "babel-core": "6.25.0",
     "babel-preset-es2015": "6.24.1",
     "babel-preset-stage-0": "6.24.1",
+    "body-parser": "^1.18.3",
     "express": "^4.16.4",
     "firebase-admin": "^6.3.0",
     "fs": "0.0.1-security",
@@ -19,7 +20,7 @@
   },
   "scripts": {
     "start": "concurrently \"npm run server\" \"npm run client\"",
-    "server": "node server2.js",
+    "server": "node server.js",
     "client": "node start-client.js",
     "dev": "echo \"This command has been deprecated. Use 'npm start'\" && exit 1"
   },
