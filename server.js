@@ -16,8 +16,6 @@ var config = {
     messagingSenderId: "1046893789178"
 };
 firebase.initializeApp(config);
-export const provider = new firebase.auth.GoogleAuthProvider();
-export const auth = firebase.auth();
 
 var db = firebase.database();
 var ref = db.ref("entries_table");
@@ -40,11 +38,6 @@ if (process.env.NODE_ENV === 'production') {
   });
 }
 
-// retrieve Basic message
-app.get('/', (req, res) =>{
-    res.send('You are now using the site')
-})
-
 // Check for login entered
 app.get('/', (req, res) =>{
     res.send('You are now using the site')
@@ -54,20 +47,28 @@ app.get('/', (req, res) =>{
 app.get('/:user', (req, res) => {
     let name = req.params.user;
     var scoreEntries = [];
-    ref.orderByChild("username").equalTo(name).on("child_added", function(snapshot) {
-        console.log(snapshot.val());
-        scoreEntries.push(snapshot.val());
-    })
-    console.log(scoreEntries);
-    if(scoreEntries === undefined || scoreEntries.length == 0) {
-        res.json({
-            message: "There are no scores yet! Add one using the 'Add Score' button",
-        });
-    }
-    else {
-        res.json(scoreEntries);
-    }
-    // res.json(scores);
+    ref.orderByChild("username").equalTo(name).once("value", function(snapshot) {
+        let items = snapshot.val();
+        for(let item in items) {
+            scoreEntries.push({
+                id: item,
+                username: items[item].username,
+                course_name: items[item].course_name,
+                date_score: items[item].date_score,
+                score: items[item].score,
+            });
+        }
+        // console.log(scoreEntries);
+        if(scoreEntries.length == 0) {
+            res.json({
+                message: "There are no scores yet! Add one using the 'Add Score' button",
+            });
+        }
+        else {
+            res.json(scoreEntries);
+            return;
+        }
+    });
 })
 
 // Insert a new score
@@ -82,13 +83,15 @@ app.get('/:user/add', (req, res) => {
         date_score: date,
         score: score
     })
-    res.send("Successfully added score to table");
+    // res.json({
+    //     message: "Successfully Added score!",
+    // });
 })
 
 // Delete a score
 app.get('/:user/delete', (req, res) => {
-    // let user_id = req.query.id;
-    var del_ref = firebase.database().ref("entries_table/-LSp7NvGDc-JD6bZyIpR");
+    let user_id = req.query.id;
+    var del_ref = firebase.database().ref("entries_table/" + id);
     del_ref.remove();
     res.send("Successfully removed score from table");
 })

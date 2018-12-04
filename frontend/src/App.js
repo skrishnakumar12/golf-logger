@@ -1,14 +1,16 @@
 import React, { Component } from 'react';
 import firebase, { auth, provider } from './firebase';
-import { Button, InputGroup, Form, FormGroup, Label, Input, FormText } from 'reactstrap';
-import { BrowserRouter, Route} from 'react-router-dom';
+import { Button, ButtonGroup, InputGroup, Form, FormGroup, Input } from 'reactstrap';
+import {BootstrapTable, TableHeaderColumn} from 'react-bootstrap-table';
 import './App.css';
 
 class App extends Component {
   constructor() {
     super();
     this.state = {
-      currentScore: '',
+      course_name: '',
+      date_score: '',
+      score: '',
       username: '',
       scores: [],
       user: null
@@ -33,54 +35,33 @@ class App extends Component {
       });
   }
   handleChange(e) {
-    this.setState({
-      [e.target.name]: e.target.value
-    });
+    this.setState({[e.target.name]: e.target.value});
   }
 
   handleSubmit(e) {
     e.preventDefault();
-    const itemsRef = firebase.database().ref('items');
-    const item = {
-      title: this.state.currentItem,
-      user: this.state.user.displayName || this.state.user.email
-    }
-    itemsRef.push(item);
-    this.setState({
-      currentItem: '',
-      username: ''
-    });
+    var queryString = this.state.user.displayName.split(' ').join('%20');
+    fetch(`/` + queryString + `/add?course=${this.state.course_name}&date=${this.state.date_score}&score=${this.state.score}`)
+    .then(this.getScores())
+    .catch( err => console.log(err))
   }
   componentDidMount() {
     auth.onAuthStateChanged((user) => {
       if (user) {
         this.setState({ user });
+        this.getScores();
       } 
     });
-    // const itemsRef = firebase.database().ref('items');
-    // itemsRef.on('value', (snapshot) => {
-    //   let items = snapshot.val();
-    //   let newState = [];
-    //   for (let item in items) {
-    //     newState.push({
-    //       id: item,
-    //       title: items[item].title,
-    //       user: items[item].user
-    //     });
-    //   }
-    //   this.setState({
-    //     items: newState
-    //   });
-    // });
-    //console.log(user);
   }
 
-  // getScores = () => {
-  //   fetch(`/${login}`)
-  //   .then(response => response.json())
-  //   .then(response => this.setState({ scores: response.data}))
-  //   .catch(err => console.log(err))
-  // }
+  getScores() {
+    var queryString = this.state.user.displayName.split(' ').join('%20');
+    fetch(`/` + queryString)
+    .then(response => response.json())
+    .then(response => this.setState({ scores: response}))
+    // .then(console.log(this.state.scores))
+    .catch(err => console.log(err))
+  }
 
   // addScore = () => {
   //   const { userScore } = this.state
@@ -88,9 +69,12 @@ class App extends Component {
   //   .then(this.getScores)
   //   .catch( err => console.log(err))
   // }
+  
 
   render() {
-    const { scores, userScore } = this.state
+    function buttonFormatter(cell, row){
+      return <ButtonGroup><Button color="danger">Delete</Button><Button color="secondary">Edit</Button></ButtonGroup>;
+    }
     return (
       <div className="App">
         <nav className="navbar navbar-dark bg-dark fixed-top">
@@ -105,7 +89,26 @@ class App extends Component {
         </nav>
         {this.state.user ?
           <div>
-            <h2>User: {this.state.user.displayName} has logged in!</h2>
+            <div className='container'>
+              <section className='add-item'>
+                <Form onSubmit={this.handleSubmit}>
+                  <FormGroup>
+                    <InputGroup>
+                      <Input type="text" name="course_name" placeholder="Enter Course Name" onChange={this.handleChange} value={this.state.user.course_name} />
+                      <Input type="text" name="date_score" placeholder="Enter Date" onChange={this.handleChange} value={this.state.date_score} />
+                      <Input type="text" name="score" placeholder="Enter Score" onChange={this.handleChange} value={this.state.score} />
+                      <Button type="submit" color="success">Add Score</Button>
+                    </InputGroup>
+                  </FormGroup>
+                </Form>
+              </section>
+              <BootstrapTable ref='table' data={this.state.scores} striped hover condensed>
+                <TableHeaderColumn isKey dataField='course_name' width='150'>Course Name</TableHeaderColumn>
+                <TableHeaderColumn dataField='date_score' width='150'>Date Entered</TableHeaderColumn>
+                <TableHeaderColumn dataField='score' width='90'>Score</TableHeaderColumn>
+                <TableHeaderColumn dataField="button" width='150' dataFormat={buttonFormatter} headerAlign='center' dataAlign='center'>Actions</TableHeaderColumn>
+              </BootstrapTable>
+            </div>
           </div>
         :
           <h2>To see all of your scores, Login!</h2>
