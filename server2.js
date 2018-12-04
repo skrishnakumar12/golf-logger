@@ -7,23 +7,15 @@ firebase.initializeApp({
 });
 
 var db = firebase.database();
-var ref = db.ref("stats_table");
+var ref = db.ref("entries_table");
 ref.once("value", function(snapshot) {
     console.log(snapshot.val());
 });
 
-var entriesRef = ref.child("entries");
-entriesRef.set({
-    entry2: {
-        username: "skrishnakumar",
-        course_name: "Augusta",
-        date_score: "2018-10-24",
-        score: "78"
-    },
-    entry3: {
-        username: "skrishnakumar",
-        course_name: "West Chase",
-        date_score: "2018-04-24",
-        score: "72"
-    }
+//var entriesRef = ref.child("entries");
+ref.push({
+    username: "zbridwell",
+    course_name: "West Chase",
+    date_score: "2017-09-02",
+    score: "67"
 });

@@ -1,17 +1,27 @@
 var express = require('express');
-var firebase = require("firebase-admin");
+//var firebase = require("firebase-admin");
+var firebase = require("firebase");
 const bodyParser = require('body-parser');
-var serviceAccount = require("./serviceAccountKey.json");
+//var serviceAccount = require("./serviceAccountKey.json");
+//credential: firebase.credential.cert(serviceAccount),
 
 // Setup firebase credentials
-firebase.initializeApp({
-    credential: firebase.credential.cert(serviceAccount),
-    databaseURL: "https://golf-logger-3dce5.firebaseio.com"
-});
+var config = {
+    //databaseURL: "https://golf-logger-3dce5.firebaseio.com",
+    apiKey: "AIzaSyBTe_94ejwFML0VQlGfQwLnMXGHUh0jimc",
+    authDomain: "golf-logger-3dce5.firebaseapp.com",
+    databaseURL: "https://golf-logger-3dce5.firebaseio.com",
+    projectId: "golf-logger-3dce5",
+    storageBucket: "golf-logger-3dce5.appspot.com",
+    messagingSenderId: "1046893789178"
+};
+firebase.initializeApp(config);
+export const provider = new firebase.auth.GoogleAuthProvider();
+export const auth = firebase.auth();
 
 var db = firebase.database();
-var ref = db.ref("stats_table");
-var entriesRef = ref.child("entries");
+var ref = db.ref("entries_table");
+
 // define the Express app
 var app = express();
 app.use(bodyParser.urlencoded({ extended: false }));  
@@ -35,19 +45,29 @@ app.get('/', (req, res) =>{
     res.send('You are now using the site')
 })
 
+// Check for login entered
+app.get('/', (req, res) =>{
+    res.send('You are now using the site')
+})
+
 //Retrieve all the user data
 app.get('/:user', (req, res) => {
     let name = req.params.user;
-    // let course = req.query.course;
-    // let date = req.query.date;
-    // let score = req.query.score;
-    // console.log("Username: " + name + " Course name: " + course +
-    //             " Date of score: " + date + " Score: " + score);
-    //console.log("User: " + name);
-    // res.json(req.query);
-    ref.once("value", function(snapshot) {
+    var scoreEntries = [];
+    ref.orderByChild("username").equalTo(name).on("child_added", function(snapshot) {
         console.log(snapshot.val());
+        scoreEntries.push(snapshot.val());
     })
+    console.log(scoreEntries);
+    if(scoreEntries === undefined || scoreEntries.length == 0) {
+        res.json({
+            message: "There are no scores yet! Add one using the 'Add Score' button",
+        });
+    }
+    else {
+        res.json(scoreEntries);
+    }
+    // res.json(scores);
 })
 
 // Insert a new score
@@ -56,15 +76,21 @@ app.get('/:user/add', (req, res) => {
     let course = req.query.course;
     let date = req.query.date;
     let score = req.query.score;
-    // console.log("Username: " + name + ", Course name: " + course +
-    //             ", Date of score: " + date + ", Score: " + score);
-    // res.json(req.query);
-    entriesRef.push({
+    ref.push({
         username: name,
         course_name: course,
         date_score: date,
         score: score
     })
+    res.send("Successfully added score to table");
+})
+
+// Delete a score
+app.get('/:user/delete', (req, res) => {
+    // let user_id = req.query.id;
+    var del_ref = firebase.database().ref("entries_table/-LSp7NvGDc-JD6bZyIpR");
+    del_ref.remove();
+    res.send("Successfully removed score from table");
 })
 
 // start the server
