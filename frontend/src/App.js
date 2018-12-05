@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
-import firebase, { auth, provider } from './firebase';
-import { Button, ButtonGroup, InputGroup, Form, FormGroup, Input } from 'reactstrap';
+import { auth, provider } from './firebase';
+import { Button, InputGroup, Form, FormGroup, Input } from 'reactstrap';
 import {BootstrapTable, TableHeaderColumn} from 'react-bootstrap-table';
 import './App.css';
 
@@ -8,6 +8,7 @@ class App extends Component {
   constructor() {
     super();
     this.state = {
+      idDelete: [],
       course_name: '',
       date_score: '',
       score: '',
@@ -20,6 +21,8 @@ class App extends Component {
     this.handleSubmit = this.handleSubmit.bind(this);
     this.login = this.login.bind(this);
     this.logout = this.logout.bind(this);
+    this.delete = this.delete.bind(this);
+    this.handleRowSelect = this.handleRowSelect.bind(this);
   }
   login() {
     auth.signInWithPopup(provider) 
@@ -34,6 +37,15 @@ class App extends Component {
         this.setState({user: null});
       });
   }
+  delete() {
+    var queryString = this.state.user.displayName.split(' ').join('%20');
+    for(let id in this.state.idDelete) {
+      fetch(`/` + queryString + `/delete?id=${this.state.idDelete[id]}`)
+      .then()
+      .catch( err => console.log(err))
+    }
+    this.getScores();
+  }
   handleChange(e) {
     this.setState({[e.target.name]: e.target.value});
   }
@@ -44,6 +56,11 @@ class App extends Component {
     fetch(`/` + queryString + `/add?course=${this.state.course_name}&date=${this.state.date_score}&score=${this.state.score}`)
     .then(this.getScores())
     .catch( err => console.log(err))
+    this.setState({
+      course_name: '',
+      date_score: '',
+      score: ''
+    });
   }
   componentDidMount() {
     auth.onAuthStateChanged((user) => {
@@ -63,17 +80,23 @@ class App extends Component {
     .catch(err => console.log(err))
   }
 
-  // addScore = () => {
-  //   const { userScore } = this.state
-  //   fetch(`/user/add?username='${userScore.username}'&course_name='${userScore.course_name}'&date_score='${userScore.date_score}'&score='${userScore.score}'`)
-  //   .then(this.getScores)
-  //   .catch( err => console.log(err))
-  // }
-  
+  handleRowSelect(row, isSelected, e) {
+    if(isSelected) {
+      this.state.idDelete.push(row.id);
+    }
+    else {
+      var index = this.state.idDelete.indexOf(row.id)
+      if(index > -1) {
+        this.state.idDelete.splice(index, 1);
+      }
+    }
+  }
 
   render() {
-    function buttonFormatter(cell, row){
-      return <ButtonGroup><Button color="danger">Delete</Button><Button color="secondary">Edit</Button></ButtonGroup>;
+    // To delete rows you be able to select rows
+    const selectRowProp = {
+      mode: 'checkbox',
+      onSelect: this.handleRowSelect
     }
     return (
       <div className="App">
@@ -90,23 +113,22 @@ class App extends Component {
         {this.state.user ?
           <div>
             <div className='container'>
-              <section className='add-item'>
-                <Form onSubmit={this.handleSubmit}>
-                  <FormGroup>
-                    <InputGroup>
-                      <Input type="text" name="course_name" placeholder="Enter Course Name" onChange={this.handleChange} value={this.state.user.course_name} />
-                      <Input type="text" name="date_score" placeholder="Enter Date" onChange={this.handleChange} value={this.state.date_score} />
-                      <Input type="text" name="score" placeholder="Enter Score" onChange={this.handleChange} value={this.state.score} />
-                      <Button type="submit" color="success">Add Score</Button>
-                    </InputGroup>
-                  </FormGroup>
-                </Form>
-              </section>
-              <BootstrapTable ref='table' data={this.state.scores} striped hover condensed>
-                <TableHeaderColumn isKey dataField='course_name' width='150'>Course Name</TableHeaderColumn>
+              <Form onSubmit={this.handleSubmit}>
+                <FormGroup>
+                  <InputGroup>
+                    <Input type="text" name="course_name" placeholder="Enter Course Name" onChange={this.handleChange} value={this.state.course_name} />
+                    <Input type="text" name="date_score" placeholder="Enter Date" onChange={this.handleChange} value={this.state.date_score} />
+                    <Input type="text" name="score" placeholder="Enter Score" onChange={this.handleChange} value={this.state.score} />
+                    <Button type="submit" color="success">Add Score</Button>
+                  </InputGroup>
+                </FormGroup>
+              </Form>
+              <Button color="danger" className="float-left" onClick={this.delete}>Delete</Button>
+              <BootstrapTable data={this.state.scores} selectRow={selectRowProp} striped hover condensed>
+                <TableHeaderColumn isKey dataField='id' width='150' hidden>ID</TableHeaderColumn>
+                <TableHeaderColumn dataField='course_name' width='150'>Course Name</TableHeaderColumn>
                 <TableHeaderColumn dataField='date_score' width='150'>Date Entered</TableHeaderColumn>
                 <TableHeaderColumn dataField='score' width='90'>Score</TableHeaderColumn>
-                <TableHeaderColumn dataField="button" width='150' dataFormat={buttonFormatter} headerAlign='center' dataAlign='center'>Actions</TableHeaderColumn>
               </BootstrapTable>
             </div>
           </div>
@@ -114,44 +136,6 @@ class App extends Component {
           <h2>To see all of your scores, Login!</h2>
         }
       </div>
-      // <div className="App">
-      //   {scores.map(this.renderScores)}
-
-      //   <Table>
-      //     <thead>
-      //       <tr>
-      //         <th>Name</th>
-      //         <th>Course</th>
-      //         <th>Date</th>
-      //         <th>Score</th>
-      //       </tr>
-      //     </thead>
-      //     <tbody>
-      //       <tr>
-      //         <td>{userScore.name}</td>
-      //         <td>{userScore.course}</td>
-      //         <td>{userScore.date}</td>
-      //         <td>{userScore.score}</td>
-      //       </tr>
-      //     </tbody>
-      //     {/* <input
-      //       value={userScore.name}
-      //       onChange={e => this.setState({ userScore: {...userScore, name:e.target.value}})} />
-      //       <input
-      //       value={userScore.course}
-      //       onChange={e => this.setState({ userScore: {...userScore, course:e.target.value}})} />
-      //       <input
-      //       value={userScore.date}
-      //       onChange={e => this.setState({ userScore: {...userScore, date:e.target.value}})} />
-      //       <input
-      //       value={userScore.score}
-      //       onChange={e => this.setState({ userScore: {...userScore, score:e.target.value}})} />
-      //       <Button color="secondary" onClick={this.editScore}> Edit</Button>
-      //       <Button color="danger" onClick={this.deleteScore}> Delete</Button> */}
-      //   </Table>
-      //   <Button color="secondary" onClick={this.editScore}> Edit</Button>
-      //   <Button color="danger" onClick={this.deleteScore}> Delete</Button>
-      // </div>
     );
   }
 }

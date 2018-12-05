@@ -1,5 +1,4 @@
 var express = require('express');
-//var firebase = require("firebase-admin");
 var firebase = require("firebase");
 const bodyParser = require('body-parser');
 //var serviceAccount = require("./serviceAccountKey.json");
@@ -58,7 +57,6 @@ app.get('/:user', (req, res) => {
                 score: items[item].score,
             });
         }
-        // console.log(scoreEntries);
         if(scoreEntries.length == 0) {
             res.json({
                 message: "There are no scores yet! Add one using the 'Add Score' button",
@@ -83,17 +81,14 @@ app.get('/:user/add', (req, res) => {
         date_score: date,
         score: score
     })
-    // res.json({
-    //     message: "Successfully Added score!",
-    // });
 })
 
 // Delete a score
 app.get('/:user/delete', (req, res) => {
     let user_id = req.query.id;
-    var del_ref = firebase.database().ref("entries_table/" + id);
+    var del_ref = firebase.database().ref("entries_table/" + user_id);
     del_ref.remove();
-    res.send("Successfully removed score from table");
+    // res.send("Successfully removed score from table");
 })
 
 // start the server
