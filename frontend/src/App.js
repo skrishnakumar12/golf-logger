@@ -123,6 +123,8 @@ class App extends Component {
                   </InputGroup>
                 </FormGroup>
               </Form>
+              {this.state.scores.message !==  "There are no scores yet! Add one using the 'Add Score' button" ?
+              <div>
               <Button color="danger" className="float-left" onClick={this.delete}>Delete</Button>
               <BootstrapTable data={this.state.scores} selectRow={selectRowProp} striped hover condensed>
                 <TableHeaderColumn isKey dataField='id' width='150' hidden>ID</TableHeaderColumn>
@@ -130,6 +132,10 @@ class App extends Component {
                 <TableHeaderColumn dataField='date_score' width='150'>Date Entered</TableHeaderColumn>
                 <TableHeaderColumn dataField='score' width='90'>Score</TableHeaderColumn>
               </BootstrapTable>
+              </div>
+              :
+              <h2 color="red">Add a score to see it here!</h2>
+              }
             </div>
           </div>
         :
