@@ -27,6 +27,6 @@
     "heroku-postbuild": "cd frontend && npm install && npm run build"
   },
   "devDependencies": {
-    "concurrently": "^3.1.0"
+    "concurrently": "^4.0.1"
   }
 }
